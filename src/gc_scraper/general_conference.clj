@@ -37,16 +37,14 @@
                                   "<h2>References</h2>" html-references-string))
       :out
       (str/replace #"(?s)#\+BEGIN_HTML.*?#\+END_HTML" "") ; Clear HTML markers for cleaner ORG
-      (str/replace #" " " ")
-      ;(str/replace #"\n(\w)" "\1") ; remove pandoc's customary line ending
-      ))
+      (str/replace #" " " ")))
 
 
 (defn gc [output-path & [talk-urls]]
   (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
         single-output-file (str output-path "all.org")]
     (println "writing to " single-output-file)
-    (spit single-output-file "#+TITLE: General Conference 2018\n") ;; clear the file first
+    (spit single-output-file "#+TITLE: General Conference April 2018\n") ;; clear the file first
     (doseq [talk html-talks]
       (let [enlive-html-content (get-content talk)
             org-doc (pandoc-from-html {:title (get-title talk)
