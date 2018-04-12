@@ -1,0 +1,22 @@
+* gc-scraper
+A quick-and-dirty webscraper for LDS General Conference, using Pandoc to convert to orgmode files.
+
+** Prerequisites
+You will need [[https://github.com/technomancy/leiningen][Leiningen]] 2.0.0 or above installed.
+
+You will also need [[http://pandoc.org/][Pandoc]] which is available free and also through linux repos. Pandoc performs the format conversion. 
+
+** Running
+Right now this can only be run from the REPL, like:
+
+#+BEGIN_SRC clojure
+gc-scraper.general-conference> (get-web-gc "my/slash/ending/output/directory/"
+#+END_SRC
+
+** TODO Improvements
+- [ ] Clean up handling of references
+- [ ] More robust output-dir handling
+- [ ] Commandline Operability
+
+** License
+Copyright © 2018 Tory S. Anderson
