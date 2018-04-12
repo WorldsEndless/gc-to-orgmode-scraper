@@ -1,5 +1,5 @@
 * gc-scraper
-A quick-and-dirty webscraper for LDS General Conference, using Pandoc to convert to orgmode files.
+2018 April edition. A quick-and-dirty webscraper for LDS General Conference, using Pandoc to convert to orgmode files.
 
 ** Prerequisites
 You will need [[https://github.com/technomancy/leiningen][Leiningen]] 2.0.0 or above installed.
@@ -17,6 +17,7 @@ gc-scraper.general-conference> (get-web-gc "my/slash/ending/output/directory/"
 - [ ] Clean up handling of references
 - [ ] More robust output-dir handling
 - [ ] Commandline Operability
+- [ ] Allow specifying of different conference years or urls
 
 ** License
-Copyright © 2018 Tory S. Anderson
+Copyright © 2018 Tory S. Anderson with the GPL v3 License. Use and modification is fine; attribution appreciated. 
