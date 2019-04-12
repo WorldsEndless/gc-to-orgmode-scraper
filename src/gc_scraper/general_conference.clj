@@ -38,25 +38,31 @@
       :out
       (str/replace #"(?s)#\+BEGIN_HTML.*?#\+END_HTML" "") ; Clear HTML markers for cleaner ORG
       (str/replace #" " " ")))
-
+(defn pandoc?
+  "Is pandoc installed on the system?"
+  []
+  (try (clojure.java.shell/sh "pandoc" "-v")
+       (catch java.io.IOException _ false)))
 
 (defn gc [output-path & [talk-urls]]
-  (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
-        single-output-file (str output-path "all.org")]
-    (println "writing to " single-output-file)
-    (spit single-output-file "#+TITLE: General Conference April 2018\n") ;; clear the file first
-    (doseq [talk html-talks]
-      (let [enlive-html-content (get-content talk)
-            org-doc (pandoc-from-html {:title (get-title talk)
-                                       :author (get-author talk)
-                                       :html-content-string (reduce str (html/emit* enlive-html-content))
-                                       :html-references-string (reduce str (html/emit* (get-references talk)))})]
-        (do
-          (println "Processing " (get-title talk))
-          (spit single-output-file org-doc :append true))))))
+  (if-not (pandoc?)
+    (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
+    (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
+          single-output-file (str output-path "all.org")]
+      (println "writing to " single-output-file)
+      (spit single-output-file "#+TITLE: General Conference April 2019\n") ;; clear the file first
+      (doseq [talk html-talks]
+        (let [enlive-html-content (get-content talk)
+              org-doc (pandoc-from-html {:title (get-title talk)
+                                         :author (get-author talk)
+                                         :html-content-string (reduce str (html/emit* enlive-html-content))
+                                         :html-references-string (reduce str (html/emit* (get-references talk)))})]
+          (do
+            (println "Processing " (get-title talk))
+            (spit single-output-file org-doc :append true)))))))
 
 (defn get-web-gc
-  "Get general conferencefrom the website"
+  "Get general conference from the website"
   [output-dir-path]
   (let [index-url "https://www.lds.org/general-conference?lang=eng"
         talk-urls (-> index-url URL. html/html-resource (html/select [:a.lumen-tile__link])
@@ -64,3 +70,6 @@
     (gc output-dir-path ; TODO requires a slash at the end, right now
         talk-urls)))
                                         
+#_(do 
+  (def output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/20191/")
+  (get-web-gc output-dir-path))
