@@ -9,11 +9,11 @@
            [java.io File]))
 
 (defn get-title [talk]
-  (-> (html/select talk [:div.title-block :div]) first :content first))
+  (-> (html/select talk [:head :title]) first :content first))
 
 (defn get-author [talk]
   (try
-    (-> (html/select talk [:a.article-author__name]) first :content first)
+    (-> (html/select talk [:p.author-name]) first :content first)
     (catch Exception e (do (println "No author found")
                            "<no author>"))))
 
@@ -50,7 +50,7 @@
     (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
           single-output-file (str output-path "all.org")]
       (println "writing to " single-output-file)
-      (spit single-output-file "#+TITLE: General Conference April 2019\n") ;; clear the file first
+      (spit single-output-file "#+TITLE: General Conference October 2019\n") ;; clear the file first
       (doseq [talk html-talks]
         (let [enlive-html-content (get-content talk)
               org-doc (pandoc-from-html {:title (get-title talk)
@@ -71,5 +71,5 @@
         talk-urls)))
                                         
 #_(do 
-  (def output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/20191/")
+  (def output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/20192/")
   (get-web-gc output-dir-path))
