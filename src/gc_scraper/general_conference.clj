@@ -1,9 +1,5 @@
 (ns gc-scraper.general-conference
-  (:require [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [clojure.java.io :as io]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [net.cgrand.enlive-html :as html])
   (:import [java.net URL]
            [java.io File]))
@@ -69,7 +65,7 @@
   "Get general conference from the website"
   [output-dir-path]
   (let [domain "https://www.churchofjesuschrist.org"
-        conference-substring "/study/general-conference/2020/10"
+        conference-substring "/study/general-conference/2021/04"
         lang "?lang=eng"
         index-url (str domain conference-substring lang)
         talk-urls (-> index-url URL. html/html-resource
@@ -83,5 +79,5 @@
         talk-urls)))
                                         
 #_(do 
-  (def output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2020-2/")
-  (get-web-gc output-dir-path))
+    (let [ output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2021-1/"]
+      (get-web-gc output-dir-path)))
