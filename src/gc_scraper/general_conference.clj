@@ -35,6 +35,7 @@
       :out
       (str/replace #"(?s)#\+BEGIN_HTML.*?#\+END_HTML" "") ; Clear HTML markers for cleaner ORG
       (str/replace #" " " ")))
+
 (defn pandoc?
   "Is pandoc installed on the system?"
   []
@@ -47,9 +48,9 @@
   (if-not (pandoc?)
     (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
     (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
-          single-output-file (str output-path "all.org")]
+          single-output-file (str output-path "gc-all.org")]
       (println "writing to " single-output-file)
-      (spit single-output-file "#+TITLE: General Conference April 2020\n") ;; clear the file first
+      (spit single-output-file "#+TITLE: General Conference\n") ;; clear the file first
       (doseq [talk html-talks]
         (let [enlive-html-content (get-content talk)
               org-doc (pandoc-from-html {:title (get-title talk)
@@ -65,7 +66,7 @@
   "Get general conference from the website"
   [output-dir-path]
   (let [domain "https://www.churchofjesuschrist.org"
-        conference-substring "/study/general-conference/2021/04"
+        conference-substring "/study/general-conference/2021/10"
         lang "?lang=eng"
         index-url (str domain conference-substring lang)
         talk-urls (-> index-url URL. html/html-resource
@@ -78,6 +79,6 @@
     (gc output-dir-path ; TODO requires a slash at the end, right now
         talk-urls)))
                                         
-#_(do 
-    (let [ output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2021-1/"]
+(comment
+    (let [ output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2021-2/"]
       (get-web-gc output-dir-path)))
