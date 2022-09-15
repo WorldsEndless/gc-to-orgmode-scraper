@@ -66,7 +66,7 @@
   "Get general conference from the website"
   [output-dir-path]
   (let [domain "https://www.churchofjesuschrist.org"
-        conference-substring "/study/general-conference/2021/10"
+        conference-substring "/study/general-conference/2022/04"
         lang "?lang=eng"
         index-url (str domain conference-substring lang)
         talk-urls (-> index-url URL. html/html-resource
@@ -80,5 +80,5 @@
         talk-urls)))
                                         
 (comment
-    (let [ output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2021-2/"]
+    (let [output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2022-1/"]
       (get-web-gc output-dir-path)))
