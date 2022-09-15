@@ -4,6 +4,13 @@
   (:import [java.net URL]
            [java.io File]))
 
+(def source-urls
+  {:domain "https://www.churchofjesuschrist.org"
+   :general-conference {:substring "/study/general-conference/2022/04"
+                        :suffix "?lang=eng"}
+   :come-follow-me-2022 {:substring "/study/manual/come-follow-me-for-individuals-and-families-old-testament-2022"
+                         :suffix "?lang=eng"}
+   })
 (defn get-title [talk]
   (-> (html/select talk [:head :title]) first :content first))
 
@@ -42,16 +49,18 @@
   (try (clojure.java.shell/sh "pandoc" "-v")
        (catch java.io.IOException _ false)))
 
-(defn gc
+(defn collect-content
   "Given an output dir and all the talk URLs, produce each file of pandoc results of the content of each talk"
- [output-path & [talk-urls]]
+ [output-path & {:keys [urls file-topline all-file-name]}]
   (if-not (pandoc?)
     (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
-    (let [html-talks (map #(html/html-resource (URL. %)) talk-urls)
-          single-output-file (str output-path "gc-all.org")]
+    (let [file-topline (or file-topline "#+TITLE: General Conference\n")
+          all-file-name (or all-file-name "gc-all.org")
+          html-content (map #(html/html-resource (URL. %)) urls)
+          single-output-file (str output-path all-file-name)]
       (println "writing to " single-output-file)
-      (spit single-output-file "#+TITLE: General Conference\n") ;; clear the file first
-      (doseq [talk html-talks]
+      (spit single-output-file file-topline) ;; clear the file first
+      (doseq [talk html-content]
         (let [enlive-html-content (get-content talk)
               org-doc (pandoc-from-html {:title (get-title talk)
                                          :author (get-author talk)
@@ -65,9 +74,9 @@
 (defn get-web-gc
   "Get general conference from the website"
   [output-dir-path]
-  (let [domain "https://www.churchofjesuschrist.org"
-        conference-substring "/study/general-conference/2022/04"
-        lang "?lang=eng"
+  (let [domain (source-urls :domain)
+        conference-substring (get-in source-urls [:general-conference :substring])
+        lang (get-in source-urls [:general-conference :suffix])
         index-url (str domain conference-substring lang)
         talk-urls (-> index-url URL. html/html-resource
                       (html/select [:li :a])
@@ -76,9 +85,27 @@
                                      (re-pattern
                                       (str conference-substring "/"))
                                      %))))]
-    (gc output-dir-path ; TODO requires a slash at the end, right now
+    (collect-content output-dir-path ; TODO requires a slash at the end, right now
+       {:urls talk-urls})))
+
+(defn get-come-follow-me
+  "Get Come Follow Me from the website"
+  [output-dir-path]
+  (let [domain (source-urls :domain)
+        conference-substring (get-in source-urls [:general-conference :substring])
+        lang (get-in source-urls [:general-conference :suffix])
+        index-url (str domain conference-substring lang)
+        talk-urls (-> index-url URL. html/html-resource
+                      (html/select [:li :a])
+                      (->> (map #(str domain (get-in % [:attrs :href])))
+                           (filter #(re-find
+                                     (re-pattern
+                                      (str conference-substring "/"))
+                                     %))))]
+    (collect-content output-dir-path ; TODO requires a slash at the end, right now
         talk-urls)))
+
                                         
 (comment
-    (let [output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2022-1/"]
+    (let [output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/"]
       (get-web-gc output-dir-path)))
