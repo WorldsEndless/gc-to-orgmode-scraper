@@ -6,9 +6,11 @@
 
 (def source-urls
   {:domain "https://www.churchofjesuschrist.org"
-   :general-conference {:substring "/study/general-conference/2022/04"
+   :general-conference {:substring "/study/general-conference/2023/04"
                         :suffix "?lang=eng"}
    :come-follow-me-2022 {:substring "/study/manual/come-follow-me-for-individuals-and-families-old-testament-2022"
+                         :suffix "?lang=eng"}
+   :come-follow-me-2023 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2023"
                          :suffix "?lang=eng"}
    })
 (defn get-title [talk]
@@ -62,6 +64,7 @@
           all-file-name (or all-file-name "gc-all.org")
           html-content (map #(html/html-resource (URL. %)) urls)
           single-output-file (str output-path all-file-name)]
+      ;; (def single)
       (println "writing to " single-output-file)
       (spit single-output-file file-topline) ;; clear the file first
       (doseq [talk html-content]
@@ -112,13 +115,14 @@
                                      %))))]
     (collect-content output-dir-path ; TODO requires a slash at the end, right now
        {:urls talk-urls})))
+;; (def urls talk-urls)
 
 (defn get-come-follow-me
   "Get Come Follow Me from the website"
   [output-dir-path]
   (let [domain (source-urls :domain)
-        cfm-substring (get-in source-urls [:come-follow-me-2022 :substring])
-        lang (get-in source-urls [:come-follow-me-2022 :suffix])
+        cfm-substring (get-in source-urls [:come-follow-me-2023 :substring])
+        lang (get-in source-urls [:come-follow-me-2023 :suffix])
         index-url (str domain cfm-substring lang)
         chapter-urls (-> index-url URL. html/html-resource
                       (html/select [:li :a])
@@ -127,8 +131,8 @@
                                      (re-pattern
                                       (str cfm-substring "/"))
                                      %))))
-        file-topline "#+TITLE: Come Follow Me 2022: Old Testament"
-        all-file-name "cfm2022.org"
+        file-topline "#+TITLE: Come Follow Me 2023: New Testament"
+        all-file-name "cfm2023.org"
         urls chapter-urls
         cfm-data {:file-topline file-topline
                   :all-file-name all-file-name
@@ -136,7 +140,9 @@
     (collect-cfm-content output-dir-path ; TODO requires a slash at the end, right now
         chapter-urls)))
 
-EaG?                                        
 (comment
-    (let [output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/"]
-      (get-come-follow-me output-dir-path)))
+  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"
+        output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2023"]
+    #_(get-come-follow-me output-dir-path)
+    (get-web-gc gc-path)
+    ))
