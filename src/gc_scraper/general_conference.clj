@@ -57,14 +57,13 @@
 
 (defn collect-content
   "Given an output dir and all the talk URLs, produce each file of pandoc results of the content of each talk"
- [output-path & {:keys [urls file-topline all-file-name]}]
+ [output-path & [{:keys [urls file-topline all-file-name]}]]
   (if-not (pandoc?)
     (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
     (let [file-topline (or file-topline "#+TITLE: General Conference\n")
           all-file-name (or all-file-name "gc-all.org")
           html-content (map #(html/html-resource (URL. %)) urls)
           single-output-file (str output-path all-file-name)]
-      ;; (def single)
       (println "writing to " single-output-file)
       (spit single-output-file file-topline) ;; clear the file first
       (doseq [talk html-content]
@@ -114,7 +113,8 @@
                                       (str conference-substring "/"))
                                      %))))]
     (collect-content output-dir-path ; TODO requires a slash at the end, right now
-       {:urls talk-urls})))
+                     {:urls talk-urls}))
+  )
 ;; (def urls talk-urls)
 
 (defn get-come-follow-me
@@ -142,7 +142,8 @@
 
 (comment
   (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"
-        output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2023"]
+        cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2023"
+        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"]
     #_(get-come-follow-me output-dir-path)
     (get-web-gc gc-path)
     ))
