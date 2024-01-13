@@ -12,7 +12,10 @@
                          :suffix "?lang=eng"}
    :come-follow-me-2023 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2023"
                          :suffix "?lang=eng"}
-   })
+   :come-follow-me-2024 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2023"
+                         :suffix "?lang=eng"}
+})
+
 (defn get-title [talk]
   (-> (html/select talk [:head :title]) first :content first))
 
@@ -79,13 +82,14 @@
 
 (defn collect-cfm-content
   "Given an output dir and all the talk URLs, produce each file of pandoc results of the content of each talk"
- [output-dir-path & {:keys [urls file-topline all-file-name]}]
+  [cfm-output-dir-path & {:keys [urls file-topline all-file-name]
+                          :or {:file-topline "#+TITLE: Come Follow Me\n"
+                               :all-file-name "gc-all.org"}}]
   (if-not (pandoc?)
     (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
-    (let [file-topline (or file-topline "#+TITLE: Come Follow Me\n")
-          all-file-name (or all-file-name "gc-all.org")
+    (let [_ (println ">> made it HERE")
           html-content (map #(html/html-resource (URL. %)) urls)
-          single-output-file (str output-dir-path all-file-name)]
+          single-output-file (str cfm-output-dir-path all-file-name)]
       (println "writing to " single-output-file)
       (spit single-output-file file-topline) ;; clear the file first
       (doseq [chapter html-content] ; (def chapter (second html-content))
@@ -121,9 +125,13 @@
   "Get Come Follow Me from the website"
   [output-dir-path]
   (let [domain (source-urls :domain)
-        cfm-substring (get-in source-urls [:come-follow-me-2023 :substring])
+        current-edition :come-follow-me-2024
+        cfm-substring (get-in source-urls [current-edition :substring])
         lang (get-in source-urls [:come-follow-me-2023 :suffix])
         index-url (str domain cfm-substring lang)
+        title (-> index-url URL. html/html-resource
+                  (html/select [:head :title])
+                  first)
         chapter-urls (-> index-url URL. html/html-resource
                       (html/select [:li :a])
                       (->> (map #(str domain (get-in % [:attrs :href])))
@@ -131,8 +139,8 @@
                                      (re-pattern
                                       (str cfm-substring "/"))
                                      %))))
-        file-topline "#+TITLE: Come Follow Me 2023: New Testament"
-        all-file-name "cfm2023.org"
+        file-topline (str "#+TITLE: " title)
+        all-file-name (str current-edition "org")
         urls chapter-urls
         cfm-data {:file-topline file-topline
                   :all-file-name all-file-name
@@ -140,11 +148,15 @@
     (collect-cfm-content output-dir-path ; TODO requires a slash at the end, right now
         chapter-urls)))
 
-(comment
-  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"
-        cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2023"
+(comment "General Conference"
+  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-2/"
         output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-2/"]
-    #_(get-come-follow-me output-dir-path)
     (get-web-gc gc-path)
     )
   )
+
+(comment "Come Follow Me"
+         (let [cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2024/" ]
+           (get-come-follow-me cfm-output-dir-path)
+           )
+         )
