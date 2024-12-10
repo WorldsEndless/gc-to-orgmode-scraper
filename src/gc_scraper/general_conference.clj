@@ -6,12 +6,15 @@
 
 (def source-urls
   {:domain "https://www.churchofjesuschrist.org"
-   :general-conference {:substring "/study/general-conference/2023/04"
+   :general-conference {:substring "/study/general-conference/2024/04"
                         :suffix "?lang=eng"}
    :come-follow-me-2022 {:substring "/study/manual/come-follow-me-for-individuals-and-families-old-testament-2022"
                          :suffix "?lang=eng"}
    :come-follow-me-2023 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2023"
                          :suffix "?lang=eng"}
+   :come-follow-me-2024 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2024"
+                         :suffix "?lang=eng"}
+   
    })
 (defn get-title [talk]
   (-> (html/select talk [:head :title]) first :content first))
@@ -121,8 +124,8 @@
   "Get Come Follow Me from the website"
   [output-dir-path]
   (let [domain (source-urls :domain)
-        cfm-substring (get-in source-urls [:come-follow-me-2023 :substring])
-        lang (get-in source-urls [:come-follow-me-2023 :suffix])
+        cfm-substring (get-in source-urls [:come-follow-me-2024 :substring])
+        lang (get-in source-urls [:come-follow-me-2024 :suffix])
         index-url (str domain cfm-substring lang)
         chapter-urls (-> index-url URL. html/html-resource
                       (html/select [:li :a])
@@ -131,8 +134,8 @@
                                      (re-pattern
                                       (str cfm-substring "/"))
                                      %))))
-        file-topline "#+TITLE: Come Follow Me 2023: New Testament"
-        all-file-name "cfm2023.org"
+        file-topline "#+TITLE: Come Follow Me 2024: New Testament"
+        all-file-name "cfm2024.org"
         urls chapter-urls
         cfm-data {:file-topline file-topline
                   :all-file-name all-file-name
@@ -141,9 +144,9 @@
         chapter-urls)))
 
 (comment
-  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"
-        cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2023"
-        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-1/"]
+  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-1/"
+        cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2024"
+        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-1/"]
     #_(get-come-follow-me output-dir-path)
     (get-web-gc gc-path)
     ))
