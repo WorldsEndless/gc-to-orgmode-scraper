@@ -6,7 +6,8 @@
 
 (def source-urls
   {:domain "https://www.churchofjesuschrist.org"
-   :general-conference {:substring "/study/general-conference/2024/04"
+   :general-conference {:substring "/study/general-conference/2024/10"
+                        ;"/study/general-conference/2024/04"
                         :suffix "?lang=eng"}
    :come-follow-me-2022 {:substring "/study/manual/come-follow-me-for-individuals-and-families-old-testament-2022"
                          :suffix "?lang=eng"}
@@ -144,9 +145,9 @@
         chapter-urls)))
 
 (comment
-  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-1/"
+  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-2/"
         cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2024"
-        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-1/"]
+        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-2/"]
     #_(get-come-follow-me output-dir-path)
     (get-web-gc gc-path)
     )
