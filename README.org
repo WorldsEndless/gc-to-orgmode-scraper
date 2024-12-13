@@ -1,5 +1,5 @@
 * gc-scraper
-2018 April edition. A quick-and-dirty webscraper for LDS General Conference, using Pandoc to convert to orgmode files.
+2024 September edition. A quick-and-dirty webscraper for LDS General Conference, using Pandoc to convert to orgmode files.
 
 ** Prerequisites
 You will need [[https://github.com/technomancy/leiningen][Leiningen]] 2.0.0 or above installed.
