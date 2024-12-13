@@ -6,6 +6,8 @@ You will need [[https://github.com/technomancy/leiningen][Leiningen]] 2.0.0 or a
 
 You will also need [[http://pandoc.org/][Pandoc]] which is available free and also through linux repos. Pandoc performs the format conversion. 
 
+The output will be [[https://orgmode.org/][emacs' orgmode]], which is included in emacs and supported by pandoc. Orgmode syntax functions like a fuller version of markdown (org is older, and not inherently compatible, although exporting to markdown is possible). 
+
 ** Running
 Right now this can only be run from the REPL, like:
 
