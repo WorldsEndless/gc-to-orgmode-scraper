@@ -4,7 +4,7 @@
 ** Prerequisites
 You will need [[https://github.com/technomancy/leiningen][Leiningen]] 2.0.0 or above installed.
 
-You will also need [[http://pandoc.org/][Pandoc]] which is available free and also through linux repos. Pandoc performs the format conversion. 
+You will also need [[http://pandoc.org/][Pandoc]] which is available free and also through linux repos. Pandoc performs the format conversion from HTML. 
 
 The output will be [[https://orgmode.org/][emacs' orgmode]], which is included in emacs and supported by pandoc. Orgmode syntax functions like a fuller version of markdown (org is older, and not inherently compatible, although exporting to markdown is possible). 
 
@@ -15,11 +15,11 @@ Right now this can only be run from the REPL, like:
 gc-scraper.general-conference> (get-web-gc "my/slash/ending/output/directory/"
 #+END_SRC
 
-** TODO Improvements
-- [ ] Clean up handling of references
-- [ ] More robust output-dir handling
-- [ ] Commandline Operability
-- [ ] Allow specifying of different conference years or urls
+** STARTED Improvements [2/4]
+- [ ] Clean up handling of references (footnotes)
+- [X] More robust output-dir handling
+- [ ] Commandline Operability 
+- [X] Allow specifying of different conference years or urls
 
 ** License
-Copyright © 2018 Tory S. Anderson with the GPL v3 License. Use and modification is fine; attribution appreciated. 
+Copyright © 2024 Tory S. Anderson with the GPL v3 License. Use and modification is fine; attribution appreciated. 
