@@ -22,4 +22,4 @@ gc-scraper.general-conference> (get-web-gc "my/slash/ending/output/directory/"
 - [X] Allow specifying of different conference years or urls
 
 ** License
-Copyright © 2024 Tory S. Anderson with the GPL v3 License. Use and modification is fine; attribution appreciated. 
+Copyright © 2008-2024000 Tory S. Anderson with the GPL v3 License. Use and modification is fine; attribution appreciated. 
