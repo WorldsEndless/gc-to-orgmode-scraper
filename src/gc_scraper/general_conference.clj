@@ -6,16 +6,17 @@
 
 (def source-urls
   {:domain "https://www.churchofjesuschrist.org"
-   :general-conference {:substring "/study/general-conference/2023/10"
+   :general-conference {:substring "/study/general-conference/2024/10"
+                        ;"/study/general-conference/2024/04"
                         :suffix "?lang=eng"}
    :come-follow-me-2022 {:substring "/study/manual/come-follow-me-for-individuals-and-families-old-testament-2022"
                          :suffix "?lang=eng"}
    :come-follow-me-2023 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2023"
                          :suffix "?lang=eng"}
-   :come-follow-me-2024 {:substring "/study/manual/come-follow-me-for-home-and-church-book-of-mormon-2024"
+   :come-follow-me-2024 {:substring "/study/manual/come-follow-me-for-individuals-and-families-new-testament-2024"
                          :suffix "?lang=eng"}
-})
-
+   
+   })
 (defn get-title [talk]
   (-> (html/select talk [:head :title]) first :content first))
 
@@ -42,12 +43,8 @@
                        author (str " ( " author ")"))]
 
     (println "Attempting to gen org from " title)
-    (-> (clojure.java.shell/sh "pandoc"
-                               "-f" "html"
-                               "-t" "org"
+    (-> (clojure.java.shell/sh "pandoc" "-f" "html" "-t" "org"
                                "--wrap" "none"
-                               "--lua-filter"
-                               "remove-header-attr.lua" ;; https://emacs.stackexchange.com/questions/54400/export-a-docx-file-to-org-using-pandoc-but-without-the-property-drawers
                                :in (str
                                     "<h1>" title-string "</h1>"
                                     "<h2>Contents</h2>" html-content-string))
@@ -86,14 +83,13 @@
 
 (defn collect-cfm-content
   "Given an output dir and all the talk URLs, produce each file of pandoc results of the content of each talk"
-  [cfm-output-dir-path  &[{:keys [urls file-topline all-file-name]
-                            :or {urls nil
-                                 file-topline "#+TITLE: Come Follow Me\n"
-                                 all-file-name "cfm-all.org"}}]]
+ [output-dir-path & {:keys [urls file-topline all-file-name]}]
   (if-not (pandoc?)
     (throw (ex-info "Pandoc not found on system" {:cause :no-pandoc}))
-    (let [html-content (map #(html/html-resource (URL. %)) urls)
-          single-output-file (str cfm-output-dir-path all-file-name)]
+    (let [file-topline (or file-topline "#+TITLE: Come Follow Me\n")
+          all-file-name (or all-file-name "gc-all.org")
+          html-content (map #(html/html-resource (URL. %)) urls)
+          single-output-file (str output-dir-path all-file-name)]
       (println "writing to " single-output-file)
       (spit single-output-file file-topline) ;; clear the file first
       (doseq [chapter html-content] ; (def chapter (second html-content))
@@ -125,19 +121,13 @@
   )
 ;; (def urls talk-urls)
 
- (defn get-come-follow-me
+(defn get-come-follow-me
   "Get Come Follow Me from the website"
   [output-dir-path]
   (let [domain (source-urls :domain)
-        current-edition :come-follow-me-2024
-        cfm-substring (get-in source-urls [current-edition :substring])
-        lang (get-in source-urls [current-edition :suffix])
+        cfm-substring (get-in source-urls [:come-follow-me-2024 :substring])
+        lang (get-in source-urls [:come-follow-me-2024 :suffix])
         index-url (str domain cfm-substring lang)
-        title (-> index-url URL. html/html-resource
-                  (html/select [:head :title])
-                  first
-                  :content
-                  doall)
         chapter-urls (-> index-url URL. html/html-resource
                       (html/select [:li :a])
                       (->> (map #(str domain (get-in % [:attrs :href])))
@@ -145,25 +135,20 @@
                                      (re-pattern
                                       (str cfm-substring "/"))
                                      %))))
-        file-topline (str "#+TITLE: " title)
-        all-file-name (str (name current-edition) ".org")
+        file-topline "#+TITLE: Come Follow Me 2024: New Testament"
+        all-file-name "cfm2024.org"
         urls chapter-urls
         cfm-data {:file-topline file-topline
                   :all-file-name all-file-name
                   :urls urls}]
     (collect-cfm-content output-dir-path ; TODO requires a slash at the end, right now
-        cfm-data)))
+        chapter-urls)))
 
-(comment "General Conference"
-  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-2/"
-        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2023-2/"]
-    (get-come-follow-me gc-path)
+(comment
+  (let [gc-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-2/"
+        cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2024"
+        output-dir-path "/home/torysa/Documents/Gospel_Files/General_Conference/2024-2/"]
+    #_(get-come-follow-me output-dir-path)
+    (get-web-gc gc-path)
     )
   )
-
-(comment "Come Follow Me"
-         (let [cfm-output-dir-path "/home/torysa/Documents/Gospel_Files/Come-Follow-Me/2024/" ]
-           (get-come-follow-me cfm-output-dir-path)
-           ;(collect-cfm-content cfm-output-dir-path)
-           )
-         )
